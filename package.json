@@ -1,0 +1,27 @@
+{
+  "name": "ai-girls-report",
+  "version": "1.0.0",
+  "description": "AI-persona sitcom-style report generator: turn any topic into a multi-character dialogue PDF (waifu council edition).",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "aig": "./bin/aig.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1",
+    "playwright": "^1.49.0"
+  },
+  "scripts": {
+    "postinstall": "node scripts/check-browser.js"
+  },
+  "keywords": [
+    "pdf",
+    "report",
+    "ai-persona",
+    "anthropomorphism",
+    "dialogue"
+  ]
+}

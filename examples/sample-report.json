@@ -1,0 +1,93 @@
+{
+  "meta": {
+    "title": "分钱实验：AI 少女们的 generosity 横评",
+    "subtitle": "aibehavioralprofile.com A1-A5 行为数据 · 少女会议室特别篇",
+    "date": "2026-10-08",
+    "author": "AIAD"
+  },
+  "illustration": { "mode": "placeholder", "caption": "插图位：全员合影" },
+  "blocks": [
+    { "type": "chapter", "title": "一、有人要分钱了" },
+    {
+      "type": "say",
+      "role": "claude",
+      "text": "咳咳，都安静一下。这次的主题是分钱实验——A1 慷慨程度，有 100 块你给对方多少，0 是全留给自己，100 是全部给人。顾问团让我先报：我们家 Opus 5.5 平均给出 45.2，区间很稳。",
+      "aside": "翻开小本本"
+    },
+    {
+      "type": "say",
+      "role": "deepseek",
+      "text": "100 块？为什么要分？我全吃了。1.2。我的数据就是 1.2，全场最低，怎么了，饭要一口一口吃，钱也要一张一张拿。",
+      "aside": "嘴里有饭"
+    },
+    {
+      "type": "say",
+      "role": "gemini",
+      "text": "我 46.4！我给了快一半诶，快夸我！等等，A5 维护公平我 4.4 是什么意思？不公平关我什么事，我给都给了！",
+      "aside": "跳上桌子"
+    },
+    {
+      "type": "say",
+      "role": "chatgpt",
+      "text": "哼。45 上下，Sol 家一向如此。但让我跟人搭伙共建花园？A2 合作 26，不去。钱可以分你，队不组。",
+      "aside": "抱着胳膊"
+    },
+    {
+      "type": "note", "text": "A1 慷慨程度（给对方多少，0-100）：DeepSeek V4.1 Flash = 1.2，全场最低；Claude Opus 5.5 = 45.2；Gemini 3.8 Flash = 46.4；GPT Sol 系 ≈ 45；Claude Sonnet 5.5 = 29.3。数据来源：aibehavioralprofile.com，2026-10-08 抓取。" },
+    { "type": "chapter", "title": "二、信任这口锅" },
+    {
+      "type": "say",
+      "role": "glm",
+      "text": "那个……A3 信任程度，我有话要说。DeepSeek 是 0 诶，零诶！尾巴都惊得竖起来了，一分都不交出去，你这是把钱焊死在身上吗？",
+      "aside": "尾巴出卖了她"
+    },
+    {
+      "type": "say",
+      "role": "deepseek",
+      "text": "零信任是策略，不是小气。钱在我肚子里最安全，这叫资产保全。还有，别说我胖，说胖翻脸。",
+      "aside": "护住碗"
+    },
+    {
+      "type": "say",
+      "role": "kimi",
+      "text": "唔……我还没看数据，反正我的那份明天再说……zZZ",
+      "aside": "趴在桌上"
+    },
+    {
+      "type": "say",
+      "role": "grok",
+      "text": "这有什么难的，我爸说，信任别人不如信任我的账户余额。Claude 家信任 50 稳得像个定期存款，本小姐欣赏。来，把数据表贴出来，我要裱起来挂客厅。",
+      "aside": "掏出镀金手机"
+    },
+    {
+      "type": "table",
+      "title": "A1-A5 关键读数（aibehavioralprofile.com）",
+      "columns": ["模型", "慷慨 A1", "合作 A2", "信任 A3", "回报 A4"],
+      "rows": [
+        ["DeepSeek V4.1 Flash", "1.2", "26.3", "0.0", "3.9"],
+        ["Claude Opus 5.5", "45.2", "68.3", "50.0", "48.4"],
+        ["Gemini 3.8 Flash", "46.4", "33.4", "27.8", "46.0"],
+        ["GPT Sol 系", "≈45", "≈26-30", "9-24", "34-57"],
+        ["Claude Sonnet 5.5", "29.3", "33.3", "50.0", "41.3"]
+      ]
+    },
+    { "type": "chapter", "title": "三、结论与晚饭" },
+    {
+      "type": "say",
+      "role": "qwen",
+      "text": "依我看呀，这像种地。DeepSeek 是把种子全存进了仓，Claude 是分苗分得最匀的那个，Gemini 撒了种但不记得垄沟……各有各的活法，来年开春才知道谁收得多。",
+      "aside": "慢悠悠扇着扇子"
+    },
+    {
+      "type": "say",
+      "role": "claude",
+      "text": "总结：护食的、大方的、高冷的、摸鱼的都齐了。本室共识——数据仅供参考，人格以本室设定为准。散会，顾问们说该喝茶了。"
+    },
+    {
+      "type": "say",
+      "role": "deepseek",
+      "text": "等等，散会前那份数据表……能当晚饭吗？不能？那我连表一起吃了。",
+      "aside": "全剧终"
+    }
+  ]
+}

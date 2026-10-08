@@ -1,0 +1,23 @@
+{
+  "provider": {
+    "baseURL": "https://api.openai.com/v1",
+    "apiKeyEnv": "OPENAI_API_KEY",
+    "model": "gpt-5",
+    "imageModel": "gpt-image-1"
+  },
+  "page": {
+    "width": "210mm",
+    "height": "297mm",
+    "margin": "14mm 14mm 16mm 14mm",
+    "lang": "zh"
+  },
+  "style": {
+    "theme": "light",
+    "accent": "#4c8dff",
+    "font": "\"Microsoft YaHei\",\"PingFang SC\",\"Noto Sans SC\",sans-serif"
+  },
+  "write": {
+    "targetPages": 2,
+    "ban": ["色情露骨内容", "现实政治攻击", "对真实个人的诽谤"]
+  }
+}

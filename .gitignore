@@ -1,0 +1,7 @@
+node_modules/
+out/
+*.pdf
+!docs/*.pdf
+assets/
+!assets/README.txt
+.DS_Store
