@@ -36,7 +36,9 @@ function groupHtml(cast, assets, cfg) {
       const src = assets.avatars[r.id];
       return `<figure><div class="g-ava" style="border-color:${esc(r.color)}">${
         src ? `<img src="${src}">` : `<span>${esc(r.name[0])}</span>`
-      }</div><figcaption>${esc(r.name)}</figcaption></figure>`;
+      }</div><figcaption>${esc(r.name)}</figcaption>${
+        r.speak?.catchphrase ? `<cite>「${esc(r.speak.catchphrase)}」</cite>` : ""
+      }</figure>`;
     })
     .join("");
   const imgBlock = img
@@ -156,6 +158,7 @@ tbody tr:nth-child(even) { background: var(--card); opacity: .75; }
 .g-ava img { width:100%; height:100%; object-fit: cover; }
 .g-ava span { font-weight: 700; color: var(--muted); }
 .group-cast figcaption { font-size: 8.5pt; color: var(--muted); }
+.group-cast cite { display: block; font-style: normal; font-size: 7pt; color: var(--muted); opacity: .8; margin-top: .6mm; }
 </style></head>
 <body>
 ${headHtml(draft, cast, assets, cfg)}

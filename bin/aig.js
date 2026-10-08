@@ -84,13 +84,35 @@ switch (cmd) {
         die(
           `${e.message}\n` +
             `This provider does not serve /images. Fallback: draw/insert the picture yourself,\n` +
-            `save it next to your draft, and reference it via draft.illustration = {"mode":"image","path":"..."}.`
+            `save it next to your draft, and reference it via draft.illustration = {"mode":"image","path":"..."}.\n` +
+            `(see README.md#插图)`
         );
       }
       if (e.message.includes("not set")) die(`${e.message}\n(tip: export the key or fix provider.apiKeyEnv)`);
       die(e.message);
     });
     break;
+  }
+
+  case "validate-cast": {
+    const { loadCast } = await import("../src/config.js");
+    const { existsSync } = await import("node:fs");
+    const { resolve } = await import("node:path");
+    const cast = loadCast(opt.cast);
+    let problems = 0;
+    console.log(`cast: ${cast.title ?? "(无 title)"} · ${cast.roles.length} 名角色`);
+    for (const r of cast.roles) {
+      const missing = [];
+      if (!r.name) missing.push("name");
+      if (!r.persona) missing.push("persona");
+      const avatarOk = r.avatar ? existsSync(resolve(cast.__dir, r.avatar)) : null;
+      const flag = missing.length ? `缺字段:${missing}` : avatarOk === false ? "头像缺失(将用首字母占位)" : "OK";
+      if (missing.length) problems++;
+      console.log(` ${r.id.padEnd(10)} ${(r.name ?? "?").padEnd(10)} ${flag}${r.persona && r.persona.length < 30 ? "  persona偏短" : ""}`);
+    }
+    if (!cast.tone?.global) { console.log(" tone.global 未设置（将用默认总纲）"); }
+    if (cast.roles.length > 16) console.log(` 提示:${cast.roles.length} 名角色超出群像页 4 列网格的舒适区（>4 行），考虑精简`);
+    process.exit(problems ? 1 : 0);
   }
 
   case "build": {
@@ -119,6 +141,7 @@ switch (cmd) {
   paint --prompt ".." generate an illustration via your provider's image API
   build <draft.json>  typeset draft + avatars -> PDF
                       [--keep-html] keeps the intermediate HTML
+  validate-cast       check cast fields / avatar files / roster size
 
 Docs: README.md`);
     if (cmd && cmd !== "help" && cmd !== "--help") process.exitCode = 0;

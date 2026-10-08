@@ -3,6 +3,28 @@ import { writeFileSync } from "node:fs";
 import { makeClient } from "./client.js";
 import { validateDraft } from "./config.js";
 
+// Post-process a generated draft to the requested block budget.
+// Over budget: drop say blocks from the middle (keep opening, closing, all chapters).
+// Under budget: pad with footer notes. This makes the prompt's size hint enforceable.
+export function blockGuard(blocks, { min = 16, max = 24 } = {}) {
+  let b = blocks.slice();
+  if (b.length > max) {
+    const sayIdx = b.map((x, i) => (x.type === "say" ? i : -1)).filter((i) => i > 2 && i < b.length - 1);
+    let excess = b.length - max;
+    const drop = new Set();
+    for (const i of sayIdx) {
+      if (excess <= 0) break;
+      drop.add(i);
+      excess--;
+    }
+    b = b.filter((_, i) => !drop.has(i));
+  }
+  while (b.length < min) {
+    b.push({ type: "note", text: "（本页由写稿模式自动补足篇幅；增补素材后可删。）" });
+  }
+  return b;
+}
+
 function buildSystemPrompt(cast, cfg) {
   const cards = cast.roles
     .map((r) => {
@@ -58,9 +80,15 @@ export async function writeDraft({ topic, material, cast, cfg, out, verbose }) {
     throw new Error(`writer did not return valid JSON (first 200 chars): ${raw.slice(0, 200)}`);
   }
   validateDraft(draft, cast);
+  const before = draft.blocks.length;
+  draft.blocks = blockGuard(draft.blocks, {
+    min: cfg.write?.minBlocks ?? 16,
+    max: cfg.write?.maxBlocks ?? 24,
+  });
+  const trimmed = before - draft.blocks.length;
   draft.__cast = undefined;
   writeFileSync(out, JSON.stringify(draft, null, 2), "utf8");
   const says = draft.blocks.filter((b) => b.type === "say").length;
-  console.log(`[aig] draft written: ${out} (${draft.blocks.length} blocks, ${says} lines of dialogue)`);
+  console.log(`[aig] draft written: ${out} (${draft.blocks.length} blocks, ${says} lines of dialogue${trimmed > 0 ? `, blockGuard trimmed ${trimmed}` : ""})`);
   return draft;
 }
