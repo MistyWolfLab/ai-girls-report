@@ -49,6 +49,8 @@ npx aig build examples/sample-report.json -o out.pdf
 
 ## draft.json 格式（排版模式的输入）
 
+### 形态一：chat 单元剧（默认，可省略 mode 字段）
+
 ```jsonc
 {
   "meta": { "title": "标题", "subtitle": "副标题", "date": "2026-10-08", "author": "你" },
@@ -61,6 +63,42 @@ npx aig build examples/sample-report.json -o out.pdf
   ]
 }
 ```
+
+### 形态二：debate 辩论（气泡左右对飞）
+
+```jsonc
+{
+  "mode": "debate",
+  "meta": { "title": "辩题" },
+  "blocks": [
+    { "type": "chapter", "title": "立论" },
+    { "type": "say", "role": "chatgpt", "side": "a", "text": "正方观点…" },
+    { "type": "say", "role": "deepseek", "side": "b", "text": "反方观点…" }
+  ]
+}
+```
+
+`side: "a"` 从左侧出气泡，`"b"` 从右侧出（并带主题色淡底）。配 4v4 阵营最有对阵感。
+
+### 形态三：companion 陪读（AI 娘陪你看论文/长文）
+
+```jsonc
+{
+  "mode": "companion",
+  "meta": { "title": "陪你读 Transformer" },
+  "source": { "title": "Attention Is All You Need", "path": "paper.txt" },
+  // path 相对 draft 所在目录；也可内嵌 "segments": [{"heading": "1 Intro", "text": "…"}]
+  "annotations": [
+    { "at": 0, "role": "deepseek", "text": "注意力全归我！", "aside": "护食" }
+  ]
+}
+```
+
+- `source.path`：纯文本/markdown，按空行分段，`#` 开头的行做段标题；`at` 是段号（从 0 计）。
+- 每页**左右各站一个立绘小人**（取点评最多的前两个角色，用她们的全身 avatar），底部为她们留了固定空位。
+- 段落旁渲染角色便签：色条 + 小圆头像 + 吐槽/讲解。
+
+**篇幅**：三种形态都支持任意长度，长文自动跨页（演示见 examples/）。
 
 ## 换人换人设
 

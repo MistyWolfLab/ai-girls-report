@@ -99,7 +99,15 @@ function cropStyle(role) {
 }
 
 export function renderHtml({ draft, cast, assets, cfg }) {
-  const withGroup = assets.groupWanted !== false && (assets.group || cast.groupTitle || true);
+  const mode = draft.mode ?? "chat";
+  const withGroup = mode !== "companion" && assets.groupWanted !== false;
+  const body =
+    mode === "companion"
+      ? companionHtml(draft, cast, assets, cfg)
+      : mode === "debate"
+        ? debateHtml(draft, cast, assets, cfg)
+        : `${headHtml(draft, cast, assets, cfg)}\n${blocksHtml(draft, cast, assets, cfg)}`;
+  const extraCss = mode === "companion" ? companionCss : mode === "debate" ? debateCss : "";
   return `<!doctype html>
 <html lang="${esc(cfg.page.lang)}"><head><meta charset="utf-8">
 <style>
@@ -109,7 +117,104 @@ html,body { margin:0; padding:0; background:var(--bg); color:var(--ink);
   font-family:${cfg.style.font}; font-size:10.5pt; line-height:1.72; }
 :root { ${cssVars(cfg)} }
 h1,h2,h3 { break-after: avoid; }
-/* header */
+${baseCss}
+${extraCss}
+</style></head>
+<body>
+${body}
+${withGroup ? groupHtml(cast, assets, cfg) : ""}
+</body></html>`;
+}
+
+// ---------- debate mode: bubbles fly from both sides ----------
+
+function debateHtml(draft, cast, assets, cfg) {
+  const byId = Object.fromEntries(cast.roles.map((r) => [r.id, r]));
+  return `${headHtml(draft, cast, assets, cfg)}
+${draft.blocks.map((b) => {
+  if (b.type === "chapter") return `<h2 class="chapter"><span>${esc(b.title)}</span></h2>`;
+  if (b.type === "say") {
+    const r = byId[b.role];
+    const src = assets.avatars[r.id];
+    const side = b.side === "b" ? "side-b" : "side-a";
+    return `<div class="say duel ${side}">
+      <div class="ava" style="border-color:${esc(r.color)}">${src ? `<img src="${src}" style="${cropStyle(r)}">` : `<span>${esc(r.name[0])}</span>`}</div>
+      <div class="bubble">
+        <div class="who"><b style="color:${esc(r.color)}">${esc(r.name)}</b>${r.title ? `<i>${esc(r.title)}</i>` : ""}${b.aside ? `<em>${esc(b.aside)}</em>` : ""}</div>
+        <p>${esc(b.text)}</p>
+      </div>
+    </div>`;
+  }
+  if (b.type === "note") return `<aside class="note"><span class="tag">资料卡</span><p>${esc(b.text)}</p></aside>`;
+  if (b.type === "table") {
+    const cols = b.columns.map((c) => `<th>${esc(c)}</th>`).join("");
+    const rows = b.rows.map((row) => `<tr>${row.map((c) => `<td>${esc(c)}</td>`).join("")}</tr>`).join("");
+    return `<figure class="tbl">${b.title ? `<figcaption>${esc(b.title)}</figcaption>` : ""}<table><thead><tr>${cols}</tr></thead><tbody>${rows}</tbody></table></figure>`;
+  }
+  return "";
+}).join("\n")}`;
+}
+
+const debateCss = `
+.say.duel.side-a { flex-direction: row; }
+.say.duel.side-b { flex-direction: row-reverse; }
+.say.duel.side-b .bubble { border-radius: 3mm 0 3mm 3mm; background: color-mix(in srgb, var(--accent) 6%, var(--card)); }
+.say.duel.side-b .who { text-align: right; }
+`;
+
+// ---------- companion mode: a document with margin mascots ----------
+
+function companionHtml(draft, cast, assets, cfg) {
+  const byId = Object.fromEntries(cast.roles.map((r) => [r.id, r]));
+  const src = draft.source;
+  const annsBySeg = {};
+  for (const a of draft.annotations) (annsBySeg[a.at] ??= []).push(a);
+  const d = draft.meta;
+  const out = [];
+  out.push(`<header class="report-head">
+    <div class="kicker">陪读模式 · ${esc(d.date || "")}${d.author ? " · " + esc(d.author) : ""}</div>
+    <h1>${esc(d.title)}</h1>
+    ${d.subtitle ? `<p class="sub">${esc(d.subtitle)}</p>` : ""}
+    ${src?.title ? `<p class="src-title">原文：${esc(src.title)}</p>` : ""}
+  </header>`);
+  src.segments.forEach((seg, i) => {
+    out.push(`<section class="para${seg.heading ? " with-head" : ""}">`);
+    if (seg.heading) out.push(`<h3 class="para-head">${esc(seg.heading)}</h3>`);
+    out.push(`<p>${esc(seg.text)}</p>`);
+    for (const a of annsBySeg[i] ?? []) {
+      const r = byId[a.role];
+      const ava = assets.avatars[r.id];
+      out.push(`<div class="annot" style="border-left-color:${esc(r.color)}">
+        <span class="annot-ava" style="border-color:${esc(r.color)}">${ava ? `<img src="${ava}">` : esc(r.name[0])}</span>
+        <div><b style="color:${esc(r.color)}">${esc(r.name)}</b>${a.aside ? `<em>${esc(a.aside)}</em>` : ""}<p>${esc(a.text)}</p></div>
+      </div>`);
+    }
+    out.push(`</section>`);
+  });
+  return out.join("\n");
+}
+
+const companionCss = `
+.src-title { color: var(--muted); font-size: 9pt; margin: 2mm 0 0; }
+section.para { margin: 0 0 4.5mm; font-size: 9pt; line-height: 1.66; break-inside: auto; color: var(--muted); }
+section.para p { margin: 0; text-align: justify; }
+.para-head { font-size: 10.5pt; margin: 3mm 0 1.5mm; color: var(--ink); }
+.annot { display: flex; gap: 2.6mm; margin: 2.2mm 0 1mm 4mm; padding: 2mm 3mm;
+  background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--accent);
+  border-radius: 0 2mm 2mm 0; break-inside: avoid; }
+.annot-ava { flex: 0 0 7mm; width: 7mm; height: 7mm; border-radius: 50%; overflow: hidden;
+  border: 1.2px solid var(--accent); display: flex; align-items: center; justify-content: center;
+  font-size: 7pt; color: var(--muted); font-weight: 700; }
+.annot-ava img { width: 100%; height: 100%; object-fit: cover; }
+.annot b { font-size: 8pt; }
+.annot em { font-style: normal; color: var(--muted); font-size: 7.5pt; margin-left: 1.4mm; }
+.annot p { margin: .6mm 0 0; font-size: 9pt; }
+// (standing figures are rendered via the page footer template - see render.js mascots)
+`;
+
+// ---------- shared base css (chat mode extracted) ----------
+
+const baseCss = `
 .report-head { padding: 10mm 2mm 6mm; border-bottom: 2px solid var(--accent); margin-bottom: 7mm; }
 .report-head .kicker { color: var(--muted); font-size: 9pt; letter-spacing: .08em; }
 .report-head h1 { font-size: 24pt; margin: 3mm 0 2mm; line-height: 1.25; }
@@ -159,10 +264,4 @@ tbody tr:nth-child(even) { background: var(--card); opacity: .75; }
 .g-ava span { font-weight: 700; color: var(--muted); }
 .group-cast figcaption { font-size: 8.5pt; color: var(--muted); }
 .group-cast cite { display: block; font-style: normal; font-size: 7pt; color: var(--muted); opacity: .8; margin-top: .6mm; }
-</style></head>
-<body>
-${headHtml(draft, cast, assets, cfg)}
-${blocksHtml(draft, cast, assets, cfg)}
-${withGroup ? groupHtml(cast, assets, cfg) : ""}
-</body></html>`;
-}
+`;

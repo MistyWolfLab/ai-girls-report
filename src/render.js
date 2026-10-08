@@ -21,7 +21,17 @@ async function launchBrowser() {
   }
 }
 
-export async function htmlToPdf(html, { cfg, out, title, author }) {
+export async function htmlToPdf(html, { cfg, out, title, author, mascots }) {
+  // mascots: [leftDataUri, rightDataUri] printed in the page footer, on EVERY page
+  const footerInner = mascots?.length
+    ? mascots
+        .map((uri, i) =>
+          uri
+            ? `<img src="${uri}" style="position:absolute;${i === 0 ? "left:6mm" : "right:6mm"};bottom:0;height:44mm;opacity:.82;">`
+            : ""
+        )
+        .join("")
+    : "";
   const browser = await launchBrowser();
   try {
     const page = await browser.newPage();
@@ -36,7 +46,9 @@ export async function htmlToPdf(html, { cfg, out, title, author }) {
       displayHeaderFooter: true,
       headerTemplate: "<span></span>",
       footerTemplate:
-        '<div style="font-size:7pt;color:#98a2b3;width:100%;text-align:center;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>',
+        `<div style="font-size:7pt;color:#98a2b3;width:100%;text-align:center;position:relative;">` +
+        footerInner +
+        `<span class="pageNumber"></span> / <span class="totalPages"></span></div>`,
       headerFooterFontSize: 7,
     });
     if (title) {

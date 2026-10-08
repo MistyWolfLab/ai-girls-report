@@ -90,10 +90,17 @@ export const DEFAULT_TONE =
   "每个人用自己的人设口癖说话，句子里带动作和表情，禁止书面报告腔。";
 
 export const DRAFT_BLOCK_TYPES = ["chapter", "say", "note", "table"];
+export const DRAFT_MODES = ["chat", "debate", "companion"];
 
 export function validateDraft(draft, cast) {
   if (!draft || typeof draft !== "object") fail("draft must be an object");
   if (!draft.meta || !draft.meta.title) fail("draft.meta.title is required");
+  const mode = draft.mode ?? "chat";
+  if (!DRAFT_MODES.includes(mode)) fail(`draft.mode must be one of ${DRAFT_MODES.join("/")}, got: ${mode}`);
+  if (mode === "companion") {
+    validateCompanion(draft, cast);
+    return { ...draft, mode };
+  }
   if (!Array.isArray(draft.blocks) || draft.blocks.length === 0) {
     fail("draft.blocks must be a non-empty array");
   }
@@ -103,6 +110,9 @@ export function validateDraft(draft, cast) {
     if (b.type === "say") {
       if (!ids.has(b.role)) fail(`block[${i}] unknown role: ${b.role} (not in cast)`);
       if (!b.text) fail(`block[${i}] say block needs text`);
+      if (mode === "debate" && b.side !== undefined && !["a", "b"].includes(b.side)) {
+        fail(`block[${i}] debate side must be "a" or "b"`);
+      }
     }
     if (b.type === "chapter" && !b.title) fail(`block[${i}] chapter needs title`);
     if (b.type === "table") {
@@ -111,7 +121,23 @@ export function validateDraft(draft, cast) {
       }
     }
   });
-  return draft;
+  return { ...draft, mode };
+}
+
+function validateCompanion(draft, cast) {
+  const src = draft.source;
+  if (!src) fail('companion mode needs draft.source: {title, segments:[{heading?,text}]} or {path}');
+  if (!src.segments && !src.path) fail('companion source needs segments[] or path');
+  const anns = draft.annotations;
+  if (!Array.isArray(anns) || anns.length === 0) {
+    fail("companion mode needs a non-empty draft.annotations array");
+  }
+  const ids = new Set(cast.roles.map((r) => r.id));
+  anns.forEach((a, i) => {
+    if (!ids.has(a.role)) fail(`annotation[${i}] unknown role: ${a.role}`);
+    if (typeof a.at !== "number" || a.at < 0) fail(`annotation[${i}] needs at: <segment index>`);
+    if (!a.text) fail(`annotation[${i}] needs text`);
+  });
 }
 
 export function fail(msg) {
