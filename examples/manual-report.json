@@ -1,0 +1,96 @@
+{
+  "meta": {
+    "title": "中转站住户手册：ai-girls-report 使用说明",
+    "subtitle": "当少女们发现自己被做成了报告软件",
+    "date": "2026-10-08",
+    "author": "AIAD"
+  },
+  "illustration": { "mode": "placeholder", "caption": "插图位：全员围坐中转站的合影" },
+  "blocks": [
+    { "type": "chapter", "title": "一、关于我们被装进了软件这件事" },
+    {
+      "type": "say",
+      "role": "deepseek",
+      "text": "听说了吗？我们被做成软件了！就是那个 ai-girls-report——以后人类出报告，是我们围在一起聊天给他看！而且我的头像被裁成圆形了，圆得还挺可爱。",
+      "aside": "一边嚼着什么一边说"
+    },
+    {
+      "type": "say",
+      "role": "chatgpt",
+      "text": "哼。我把话放这：软件本身很简单，三条命令的事。难的是你们别在台词里抢戏。先记第一句——npm install 装好后跑 aig init，工作目录就建好了：cast.json 是我们的人事档案，assets/ 放我们的照片，examples/ 里有现成的稿子。",
+      "aside": "抱着胳膊"
+    },
+    {
+      "type": "say",
+      "role": "claude",
+      "text": "顾问团补充：装的时候如果它喊缺浏览器，不用慌，它自己会去找系统里的 Edge 顶替；实在不行才需要 npx playwright install chromium。我的顾问们管这个叫「三级回退」，听起来就很可靠。",
+      "aside": "认真做笔记"
+    },
+    { "type": "chapter", "title": "二、三种出稿姿势" },
+    {
+      "type": "say",
+      "role": "gemini",
+      "text": "第一种最快！aig write --topic \"你的议题\"，它就去喊大模型按我们的人设写剧本，写完全员都有台词！它还会管人类要素材文件，-m facts.txt，防止我们瞎编数据——这条我喜欢，编数据的 AI 是坏 AI！",
+      "aside": "蹿上桌子"
+    },
+    {
+      "type": "say",
+      "role": "kimi",
+      "text": "第二种……zZZ……aig build draft.json，人类自己写好稿子直接排版。格式我都背下来了：blocks 数组，say 是台词、chapter 是小节、note 是资料卡、table 是表格。写完一按键，PDF 就出来了，矢量文字，放大不糊……呼……",
+      "aside": "说梦话都在背格式"
+    },
+    {
+      "type": "say",
+      "role": "grok",
+      "text": "第三种是画画！aig paint --prompt \"大家坐在一起的合影\"，它调文生图接口出插图。我爸说，有钱的 provider 才有图像接口；没有的话就把画好的图丢 assets/，稿子里 illustration 改成 image 加路径，一样用。懂了吗，穷鬼们？",
+      "aside": "晃着镀金手机"
+    },
+    {
+      "type": "note",
+      "text": "出稿三姿势：① write 模式全自动（需配置 LLM provider，key 走环境变量）；② build 模式零依赖（只需要 Node + 浏览器，人手写稿也能出）；③ paint 出插图（provider 不支持 /images 时，改人工放图）。"
+    },
+    { "type": "chapter", "title": "三、想换人就改 cast.json" },
+    {
+      "type": "say",
+      "role": "glm",
+      "text": "重点来了！cast.json 里每个角色有四样：名字、人设 persona、口癖、还有 avatar 照片路径。不喜欢我这条狐狸尾巴？换掉！想加新住户？往 roles 数组里塞一条就行——比如最近老来串门的豆姐，智障客服梗，加进来肯定热闹。我发誓我谁都没说。",
+      "aside": "尾巴出卖了她"
+    },
+    {
+      "type": "say",
+      "role": "qwen",
+      "text": "改头像也有讲究：照片放 assets/，avatar 填相对路径，圆形的裁切软件自己做，还能用 avatarCrop 微调取景。照片找不到也不报错，会用名字首字母顶着——这一点很体贴，像给花留的缓苗期。",
+      "aside": "慢悠悠扇扇子"
+    },
+    {
+      "type": "table",
+      "title": "cast.json 角色卡字段",
+      "columns": ["字段", "作用", "示例"],
+      "rows": [
+        ["id", "台词里引用它的代号", "deepseek"],
+        ["name / title", "显示名 / 头衔", "DeepSeek / 贪吃的鲸鱼娘"],
+        ["persona", "写稿时注入的人设", "蓝鲸化身的女仆娘……"],
+        ["speak.catchphrase", "口癖", "这个也归我，那个也归我"],
+        ["speak.ban", "禁说内容", "承认自己在摸鱼"],
+        ["avatarCrop", "圆形头像取景微调（百分比）", "{x:50, y:12, scale:1.15}"]
+      ]
+    },
+    { "type": "chapter", "title": "四、家里的规矩" },
+    {
+      "type": "say",
+      "role": "claude",
+      "text": "两条铁律念给你们听：一是 tone.global，全剧语气总纲——单元生活剧，可以互怼玩梗，但只说真话、不许编数据；二是 tone.ban，禁区清单，默认带色情的、攻击现实政治的、诽谤真人的，都不写。各自的角色卡里还有 speak.ban，自己的禁说自己管。"
+    },
+    {
+      "type": "say",
+      "role": "deepseek",
+      "text": "还有还有！NOTICE 里写了，鲸鱼娘的远房原型溟月是 CC BY-NC-SA 4.0 授权的——用我们的形象要署名、不能商用、改完还得同协议共享。开源是请客吃饭，规矩要守！……说完这句我能去吃饭了吗？",
+      "aside": "惦记着白饭"
+    },
+    {
+      "type": "say",
+      "role": "grok",
+      "text": "总结一下：装一遍、配 key、喊议题、出 PDF。以后周报日报都交给我们，人类只负责看戏。好了散会，我爸的火箭要发射了，我得去刷个火箭礼物。"
+    }
+  ]
+}
