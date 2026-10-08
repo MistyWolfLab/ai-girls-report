@@ -12,15 +12,32 @@ AI 直接生成这类报告的问题是：每次版式漂移、头像丢失、�
 
 ## 快速开始
 
+### 人类版（本地部署）
+
+前置：Node.js ≥ 18（[nodejs.org](https://nodejs.org) 装 LTS 版）。
+
 ```bash
-npm install              # 会检查 playwright 浏览器，缺了跑 npx playwright install chromium
-npx aig init my-report   # 生成工作目录：cast.json / aig.config.json / examples/ / assets/
+git clone https://github.com/MistyWolfLab/ai-girls-report.git
+cd ai-girls-report
+npm install            # 装 playwright；若提示缺浏览器：npx playwright install chromium
+                       # （Windows 可跳过——软件会自动借用系统 Edge）
+npx aig init my-report # 建工作目录：cast.json / aig.config.json / examples/ / assets/
 cd my-report
 # 1) 把头像图放进 assets/（名字对齐 cast.json 里的 avatar 字段）
-# 2) 配好 LLM（aig.config.json 里 provider，key 放环境变量）
-npx aig write --topic "本周模型横评：DeepSeek 又护食了" -m facts.txt -o draft.json
-npx aig build draft.json -o report.pdf
+# 2) 排版模式不需要任何配置，直接出样例：
+npx aig build examples/sample-report.json -o out.pdf
 ```
+
+要用**写稿模式**（AI 自动写对话）才需要配 LLM：编辑 `aig.config.json` 的 `provider` 段（任意 OpenAI 兼容端点），key 放进环境变量（如 `setx OPENAI_API_KEY sk-...` 后重开终端）。不配也能用手写稿模式，**零 API 依赖**。
+
+### AI 版（给 AI 助手用）
+
+如果你是 AI agent，这是最小工作流——你的用户已经装好软件，你只需要两份文件：
+
+1. **读 `cast.json`**：角色 id、人设、口癖、禁说项都在里面；用户要换人换性格就改这里。
+2. **写 draft JSON**（格式见下节）或跑 `aig write --topic "议题" -m 素材.txt` 生成，然后 `aig build draft.json -o report.pdf`。
+
+约定：数值事实只能来自用户给的素材文件或确知事实；台词全员分配；篇幅 blocks 16-24 个。build 永远不需要 API key。
 
 三种出稿路径：
 
